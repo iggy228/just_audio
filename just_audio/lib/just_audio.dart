@@ -867,14 +867,21 @@ class AudioPlayer {
     } on PlatformException catch (e) {
       try {
         // cant connect to servers
-        if (e.code.contains("-1004") && source is LockCachingAudioSource) {
+        if (e.code.contains("1004") && source is LockCachingAudioSource) {
           // proxy is offline
           try {
             await _proxy._server.close(force: true);
           } catch (_) {
             // ignore err
           }
-          await _proxy.start();
+
+          try {
+            debugPrint('Just audio: Reconnecting to the server');
+            await _proxy.start();
+          } catch (e) {
+            throw PlayerException(-1004,
+                'Couldn\'t reconnect to the server ensure you are connected to the internet.');
+          }
         }
         throw PlayerException(int.parse(e.code), e.message,
             (e.details as Map<dynamic, dynamic>?)?.cast<String, dynamic>());
