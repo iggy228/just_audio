@@ -879,10 +879,12 @@ class AudioPlayer {
             debugPrint('Just audio: Reconnecting to the server');
             await _proxy.start();
           } catch (e) {
+            await _proxy.stop();
             throw PlayerException(-1004,
                 'Couldn\'t reconnect to the server ensure you are connected to the internet.');
           }
         }
+
         throw PlayerException(int.parse(e.code), e.message,
             (e.details as Map<dynamic, dynamic>?)?.cast<String, dynamic>());
       } on FormatException catch (_) {
